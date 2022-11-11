@@ -2,6 +2,8 @@ import express from 'express'
 import cors from 'cors'
 import * as dotenv from 'dotenv'
 import mongoose from 'mongoose'
+import User from './models/user'
+
 dotenv.config({ path: '.env' })
 
 mongoose.connect(process.env.MONGO_URI, null, error => {
@@ -24,9 +26,21 @@ app.get('/home', async (req, res) => {
     res.send({ message: 'This is the data for the home page' })
 })
 
-app.post('/post_name', async (req, res) => {
-    let { name } = req.body
-    console.log(name)
+app.post('/api/shopping-lists', async (req, res) => {
+    const { username, email, admin } = req.body
+    let user = new User({
+        username,
+        email,
+        admin,
+    })
+
+    let savedUser = await user.save()
+
+    if (savedUser) {
+        res.json(savedUser)
+    } else {
+        res.status(500).json({ message: 'Unable to save the new user' })
+    }
 })
 
 app.listen(PORT, () => console.log(`Listening on Port ${PORT}`))

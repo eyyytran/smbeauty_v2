@@ -7,6 +7,6 @@ const userSchema = new Schema({
     admin: Boolean,
 })
 
-const Users = mongoose.model('Users', userSchema)
+const User = mongoose.model('Users', userSchema)
 
-export default Users
+export default User
