@@ -1,6 +1,14 @@
 import express from 'express'
 import cors from 'cors'
-import toDosRouters from './routes/todos'
+import * as dotenv from 'dotenv'
+import mongoose from 'mongoose'
+dotenv.config({ path: '.env' })
+
+mongoose.connect(process.env.MONGO_URI, null, error => {
+    if (error) {
+        console.log('Unable to connect to database')
+    } else console.log('Connected to the database')
+})
 
 const app = express()
 const PORT = 4000
