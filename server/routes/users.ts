@@ -3,6 +3,7 @@ import * as bcrypt from 'bcrypt'
 import User from '../models/user'
 
 type UserType = {
+    _id: string
     username: string
     email: string
     password: string
@@ -47,10 +48,8 @@ usersRouter.post('/login', async (req, res) => {
         if (user) {
             const isValidated = await bcrypt.compare(password, user.password)
             if (!isValidated) return res.sendStatus(400)
-            const userResponse = { ...user }
-            delete userResponse.password
-            console.log(userResponse)
-            res.status(200).json(userResponse)
+            const { _id, email, username } = user
+            res.status(200).json({ _id, email, username })
         }
     })
 })
