@@ -1,8 +1,15 @@
-import * as express from 'express'
+import { Router } from 'express'
 import * as bcrypt from 'bcrypt'
 import User from '../models/user'
 
-const usersRouter = express.Router()
+type UserType = {
+    username: string
+    email: string
+    password: string
+    admin: boolean
+}
+
+const usersRouter = Router()
 
 usersRouter.post('/create_user', async (req, res) => {
     const { username, email, password, admin } = req.body
@@ -27,6 +34,25 @@ usersRouter.post('/create_user', async (req, res) => {
     } catch (error) {
         res.status(500).send(error)
     }
+})
+
+usersRouter.post('/login', async (req, res) => {
+    const { email, password } = req.body
+
+    if (!email || !password) return res.sendStatus(400)
+
+    const query = User.where({ email: email.toLowerCase() })
+    query.findOne(async (error, user: UserType) => {
+        if (error) return res.status(400).send(error)
+        if (user) {
+            const isValidated = await bcrypt.compare(password, user.password)
+            if (!isValidated) return res.sendStatus(400)
+            const userResponse = { ...user }
+            delete userResponse.password
+            console.log(userResponse)
+            res.status(200).json(userResponse)
+        }
+    })
 })
 
 export default usersRouter
