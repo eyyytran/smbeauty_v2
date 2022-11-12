@@ -10,13 +10,11 @@ const productSchema = new Schema({
     activeIngredients: String,
     description: String,
     subtitle: String,
-    imageURL1: String,
-    imageURL2: String,
-    imageURL3: String,
+    imageUrls: [{ type: String }],
     ingredients: String,
     usageInstructions: String,
 })
 
-const ProductList = mongoose.model('ProductList', productSchema)
+const Product = mongoose.model('Products', productSchema)
 
-export default ProductList
+export default Product
