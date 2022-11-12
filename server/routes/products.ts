@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import Product from '../models/product'
 
-type ProductType = {
+interface IProduct {
     name: string
     price: number
     type: string
@@ -27,6 +27,15 @@ productsRouter.post('/create', async (req, res) => {
         res.sendStatus(200)
     } else {
         res.sendStatus(400)
+    }
+})
+
+productsRouter.get('/get_all_inventory', async (req, res) => {
+    const totalInventory = await Product.find({})
+    if (totalInventory) {
+        res.send(totalInventory)
+    } else {
+        res.sendStatus(500)
     }
 })
 

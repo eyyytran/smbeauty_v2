@@ -2,7 +2,7 @@ import { Router } from 'express'
 import * as bcrypt from 'bcrypt'
 import User from '../models/user'
 
-type UserType = {
+interface IUser {
     _id: string
     displayName: string
     email: string
@@ -54,7 +54,7 @@ usersRouter.post('/login', async (req, res) => {
     if (!email || !password) return res.sendStatus(400)
 
     const query = User.where({ email: email.toLowerCase() })
-    query.findOne(async (error, user: UserType) => {
+    query.findOne(async (error, user: IUser) => {
         if (error) return res.status(400).send(error)
         if (user) {
             const isValidated = await bcrypt.compare(password, user.password)
