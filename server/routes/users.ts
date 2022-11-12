@@ -4,7 +4,7 @@ import User from '../models/user'
 
 type UserType = {
     _id: string
-    username: string
+    displayName: string
     email: string
     password: string
     admin: boolean
@@ -12,16 +12,27 @@ type UserType = {
 
 const usersRouter = Router()
 
-usersRouter.post('/create_user', async (req, res) => {
-    const { username, email, password, admin } = req.body
+usersRouter.post('/create', async (req, res) => {
+    const { displayName, email, password, admin } = req.body
 
-    if (!username || !email || !password) return res.sendStatus(400)
+    if (!displayName || !email || !password) return res.sendStatus(400)
+
+    const isExisting = User.exists({ email }, (err, doc) => {
+        if (err) {
+            res.sendStatus(500)
+        } else {
+            return true
+        }
+        return false
+    })
+
+    if (isExisting) return res.status(400).json({ error: 'This account already exists' })
 
     try {
         const salt = await bcrypt.genSalt(5)
         const hashedPassword = await bcrypt.hash(password, salt)
         const user = new User({
-            username,
+            displayName,
             email,
             password: hashedPassword,
             admin,
@@ -48,10 +59,16 @@ usersRouter.post('/login', async (req, res) => {
         if (user) {
             const isValidated = await bcrypt.compare(password, user.password)
             if (!isValidated) return res.sendStatus(400)
-            const { _id, email, username } = user
-            res.status(200).json({ _id, email, username })
+            const { _id, email, displayName } = user
+            res.status(200).json({ _id, email, displayName })
         }
     })
+})
+
+usersRouter.post('/update', async (req, res) => {
+    const { password, email, newPassword, newEmail, newDisplayName } = req.body
+    const query = User.where({ email })
+    query.findOne()
 })
 
 export default usersRouter
